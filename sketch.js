@@ -1,40 +1,58 @@
 let wave = [], x, y, startWidth, startHeight, mic;
 let logo, infoText_1, infoText_2, bottomText;
 let colorR, colorG, colorB;
-let selectedLineMode = 0;
+let selectedLineMode = 0, selectedVisualMode = 0;
+let buttons = [];
+const visualModes = ['lines', 'circles [not working]', 'triangles [not working]', 'fractals [not working]', 'experimential [not working]'];
 const lineModes = 
     [{
         name: 'boring', 
         position: [30, 180, 65],
         colorOption: 'static',
         colors: [0,0,0],
-        bg: [255, 255, 255]
+        bg: [255, 255, 255],
+        textColorOption: 'static',
+        textColors: [0, 0, 0]
     },
     { 
         name: 'rainbow', 
         position: [30, 120, 65],
         colorOption: 'random',
-        bg: [255, 255, 255]
+        bg: [255, 255, 255], 
+        textColorOption: 'dynamic'
     },
     {
         name: 'black-and-white', 
         position: [30, 150, 65],
         colorOption: 'static',
         colors: [255, 255, 255],
-        bg: [0, 0, 0]
+        bg: [0, 0, 0],
+        textColorOption: 'static',
+        textColors: [255, 255, 255]
     },
     {
         name: 'flower', 
         position: [30, 210, 65],
         colorOption: 'random-every-line',
-        bg: [0, 0, 0]
+        bg: [0, 0, 0],
+        textColorOption: 'dynamic'
     },
     {
         name: 'wes-anderson', 
         position: [30, 240, 65],
         colorOption: 'static',
         colors: [240, 211, 154],
-        bg: [138, 174, 191]
+        bg: [138, 174, 191],
+        textColorOption: 'static',
+        textColors: [240, 211, 154]
+    },
+    {
+        name: 'fifty-shades-of-white',
+        position: [30, 270, 65],
+        colorOption: 'fading',
+        bg: [0, 0, 0],
+        textColorOption: 'static',
+        textColors: [255, 255, 255]
     }];
 
 function preload(){
@@ -45,14 +63,13 @@ function setup() {
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent('canvas-container');
     canvas.position(0, 0);
+    textFont('Calibri');
     // start positions
     startWidth = windowWidth / 2;
     startHeight = windowHeight * 2 / 3;
     setupHeader();
     setupLineOptions();
-    // text and line specs
-    textFont('Calibri');
-    // mic
+    // mic stuff
     mic = new p5.AudioIn();
     mic.start();
     if (getAudioContext().state !== 'running') {
@@ -61,9 +78,32 @@ function setup() {
 }
 
 function draw() {
-    let { bg, colorOption, colors } = lineModes[selectedLineMode];
+    switch(selectedVisualMode){
+        case 0:
+            drawLineMode();
+            break;
+        case 1:
+            drawCircleMode();
+            break;
+        case 2:
+            drawTriangleMode();
+            break;
+        case 3:
+            drawFractalMode();
+            break;
+        case 4:
+            drawExperimentialMode();
+            break;
+        default:
+            break;
+    }
+}
+
+function drawLineMode(){
+    // ui options
+    let { bg, colorOption, colors, textColors, textColorOption } = lineModes[selectedLineMode];
     background(bg[0], bg[1], bg[2]);
-    if(colorOption === 'random' || colorOption === 'random-every-line'){
+    if(colorOption === 'random' || colorOption === 'random-every-line' || colorOption == 'fifty-shades-of-white'){
         colorR = Math.random() * 255;
         colorG = Math.random() * 255;
         colorB = Math.random() * 255;
@@ -72,11 +112,12 @@ function draw() {
         colorG = colors[1];
         colorB = colors[2];
     }
+    if(textColorOption === 'static'){
+        setLogoAndTextColor(textColors[0], textColors[1], textColors[2]);
+    } else {
+        setLogoAndTextColor(colorR, colorG, colorB);
+    }
     stroke(colorR, colorG, colorB);
-    logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-    infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-    infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-    bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
     strokeWeight(2);
     // calc of the point
     x = startWidth;
@@ -85,7 +126,6 @@ function draw() {
     wave.push([x, y]);
     if(wave.length === 0 || wave.length === 1);
     else {
-        // draw everything
         for(let i = 0; i < wave.length; i++){
             wave[i][0] = (startWidth - wave.length + i);
             if(i === 0);
@@ -95,6 +135,10 @@ function draw() {
                     // this looks ugly but nothing to do about it right now
                     if(colorOption === 'random-every-line')
                         stroke(Math.random() * 255, Math.random() * 255, Math.random() * 255);
+                    if(colorOption === 'fading'){
+                        let iVar = i - 255 / 300;
+                        stroke(iVar, iVar, iVar);
+                    }
                     line(wave[i][0], wave[i][1], wave[i+1][0], wave[i+1][1]);
                 }
             }
@@ -104,6 +148,22 @@ function draw() {
     if(wave.length === startWidth){
         wave.shift();
     }
+}
+
+function drawFractalMode(){
+
+}
+
+function drawTriangleMode(){
+
+}
+
+function drawCircleMode(){
+
+}
+
+function drawExperimentialMode(){
+
 }
 
 function touchStarted() {
@@ -120,13 +180,13 @@ function setupHeader(){
     // akanji type selector
     selector = createSelect();
     selector.position(140, 50);
-    selector.option('lines');
-    selector.option('circles');
-    selector.option('triangles');
-    selector.option('fractals');
-    selector.option('stuff');
+    visualModes.forEach((element) => {
+        selector.option(element);
+    });
     selector.changed(() => {
-        console.log(selector.value());
+        let selection = selector.value();
+        selectedVisualMode = visualModes.indexOf(selection);
+        resetUI();
     });
     // akanji informing content
     infoText_1 = createSpan('you need to give access to your microphone for akanji to start.');
@@ -140,12 +200,48 @@ function setupHeader(){
     bottomText.style('font-size', '10px');
 }
 
+function resetUI(){
+    background(255, 255, 255);
+    logo.style('color', 'rgb(0, 0, 0)');
+    infoText_1.style('color', 'rgb(0, 0, 0)');
+    infoText_2.style('color', 'rgb(0, 0, 0)');
+    bottomText.style('color', 'rgb(0, 0, 0)');
+    buttons.forEach((element, i) => {
+        element.remove();
+    })
+    buttons = [];
+    switch(selectedVisualMode){
+        case 0:
+            setupLineOptions();
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        default:
+            setupLineOptions();
+            break;
+    }
+}
+
 // create buttons for users to select line options
 function setupLineOptions(){
     let tempButton;
     lineModes.forEach((element, i) => {
-        tempButton = createButton(element.name);
+        tempButton = createButton(element.name)
         tempButton.position(element.position[0], element.position[1], element.position[2]);
         tempButton.mousePressed(() => { selectedLineMode = i; }) 
+        buttons.push(tempButton);
     });
+}
+
+function setLogoAndTextColor(colorR, colorG, colorB){
+    logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
 }
