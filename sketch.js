@@ -3,7 +3,7 @@ let logo, infoText_1, infoText_2, bottomText;
 let colorR, colorG, colorB;
 let selectedLineMode = 0, selectedVisualMode = 0;
 let buttons = [];
-const visualModes = ['lines', 'circles [not working]', 'triangles [not working]', 'fractals [not working]', 'experimential [not working]'];
+const visualModes = ['lines', 'circles [😐]', 'triangles [😐]', 'fractals [😐]', 'experimential [😐]'];
 const lineModes = 
     [{
         name: 'boring', 
@@ -55,9 +55,6 @@ const lineModes =
         textColors: [255, 255, 255]
     }];
 
-function preload(){
-}
-
 function setup() {
     // setup the canvas
     canvas = createCanvas(windowWidth, windowHeight);
@@ -100,7 +97,6 @@ function draw() {
 }
 
 function drawLineMode(){
-    // ui options
     let { bg, colorOption, colors, textColors, textColorOption } = lineModes[selectedLineMode];
     background(bg[0], bg[1], bg[2]);
     if(colorOption === 'random' || colorOption === 'random-every-line' || colorOption == 'fifty-shades-of-white'){
@@ -136,7 +132,7 @@ function drawLineMode(){
                     if(colorOption === 'random-every-line')
                         stroke(Math.random() * 255, Math.random() * 255, Math.random() * 255);
                     if(colorOption === 'fading'){
-                        let iVar = i - 255 / 300;
+                        let iVar = (255 / startWidth) * (wave.length - i)
                         stroke(iVar, iVar, iVar);
                     }
                     line(wave[i][0], wave[i][1], wave[i+1][0], wave[i+1][1]);
@@ -179,7 +175,7 @@ function setupHeader(){
     logo.style('font-size', '40px');
     // akanji type selector
     selector = createSelect();
-    selector.position(140, 50);
+    selector.position(170, 50);
     visualModes.forEach((element) => {
         selector.option(element);
     });
