@@ -117,9 +117,9 @@ function drawLineMode(){
     strokeWeight(2);
     // calc of the point
     x = startWidth;
-    y = startHeight - (mic.getLevel() * startHeight);
+    y = startHeight - (mic.getLevel() * zoomLevel * startHeight);
     // add the current point values to the array
-    wave.push([x, y]);
+    wave.push([x, y, zoomLevel]);
     if(wave.length === 0 || wave.length === 1);
     else {
         for(let i = 0; i < wave.length; i++){
@@ -200,10 +200,11 @@ function setupHeader(){
     zoomSlider = createSlider(1, 5, 1, 1);
     zoomSlider.position(30, 130);
     zoomSlider.changed(() => {
-        let zoomMultiplier = zoomSlider.value() / zoomLevel;
+        let zoomMultiplier = zoomSlider.value();
         if(!(wave === null)){
             wave.forEach(element => {
-                element[1] = startHeight - ((startHeight - element[1]) * zoomMultiplier);                
+                element[1] = startHeight - ((startHeight - element[1]) / element[2]) * zoomMultiplier;
+                element[2] = zoomMultiplier;
             });
         }
         zoomLevel = zoomSlider.value();
@@ -254,5 +255,6 @@ function setLogoAndTextColor(colorR, colorG, colorB){
     logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
     infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
     infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    infoText_3.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
     bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
 }
