@@ -1,7 +1,41 @@
-let wave = [], x, y, startWidth, startHeight, mic, mode;
-let buttonRainbow, buttonBlackAndWhite, buttonBoring, buttonFlower, buttonWesAnderson;
+let wave = [], x, y, startWidth, startHeight, mic;
 let logo, infoText_1, infoText_2, bottomText;
 let colorR, colorG, colorB;
+let selectedLineMode = 0;
+const lineModes = 
+    [{
+        name: 'boring', 
+        position: [30, 180, 65],
+        colorOption: 'static',
+        colors: [0,0,0],
+        bg: [255, 255, 255]
+    },
+    { 
+        name: 'rainbow', 
+        position: [30, 120, 65],
+        colorOption: 'random',
+        bg: [255, 255, 255]
+    },
+    {
+        name: 'black-and-white', 
+        position: [30, 150, 65],
+        colorOption: 'static',
+        colors: [255, 255, 255],
+        bg: [0, 0, 0]
+    },
+    {
+        name: 'flower', 
+        position: [30, 210, 65],
+        colorOption: 'random-every-line',
+        bg: [0, 0, 0]
+    },
+    {
+        name: 'wes-anderson', 
+        position: [30, 240, 65],
+        colorOption: 'static',
+        colors: [240, 211, 154],
+        bg: [138, 174, 191]
+    }];
 
 function preload(){
 }
@@ -15,7 +49,7 @@ function setup() {
     startWidth = windowWidth / 2;
     startHeight = windowHeight * 2 / 3;
     setupHeader();
-    setupButtons();
+    setupLineOptions();
     // text and line specs
     textFont('Calibri');
     // mic
@@ -27,55 +61,22 @@ function setup() {
 }
 
 function draw() {
-    // mode specifications
-
-    switch(mode){
-        case 'rainbow':
-            background(255, 255, 255);
-            colorR = Math.random() * 255;
-            colorG = Math.random() * 255;
-            colorB = Math.random() * 255;
-            stroke(colorR, colorG, colorB);
-            logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            break;
-        case 'black-and-white':
-            background(0, 0, 0);
-            logo.style('color', 'rgb(255, 255, 255)');
-            infoText_1.style('color', 'rgb(255, 255, 255)');
-            infoText_2.style('color', 'rgb(255, 255, 255)');
-            bottomText.style('color', 'rgb(255, 255, 255)');
-            stroke(255, 255, 255);
-            break;
-        case 'flower':
-            background(0, 0, 0);
-            colorR = Math.random() * 255;
-            colorG = Math.random() * 255;
-            colorB = Math.random() * 255;
-            logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
-            break;
-        case 'wes-anderson':
-            background(138,174,191);
-            stroke(240,211,154);
-            logo.style('color', 'rgb(240, 211, 154)');
-            infoText_1.style('color', 'rgb(240, 211, 154)');
-            infoText_2.style('color', 'rgb(240, 211, 154)');
-            bottomText.style('color', 'rgb(240, 211, 154)');
-            break;
-        default:
-            background(255, 255, 255);
-            stroke(0, 0, 0);
-            logo.style('color', 'rgb(0, 0, 0)');
-            infoText_1.style('color', 'rgb(0, 0, 0)');
-            infoText_2.style('color', 'rgb(0, 0, 0)');
-            bottomText.style('color', 'rgb(0, 0, 0)');
-            break;
+    let { bg, colorOption, colors } = lineModes[selectedLineMode];
+    background(bg[0], bg[1], bg[2]);
+    if(colorOption === 'random' || colorOption === 'random-every-line'){
+        colorR = Math.random() * 255;
+        colorG = Math.random() * 255;
+        colorB = Math.random() * 255;
+    } else if(colorOption === 'static'){
+        colorR = colors[0];
+        colorG = colors[1];
+        colorB = colors[2];
     }
+    stroke(colorR, colorG, colorB);
+    logo.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    infoText_1.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    infoText_2.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
+    bottomText.style('color', 'rgb(' + colorR + ',' + colorG + ',' + colorB + ')');
     strokeWeight(2);
     // calc of the point
     x = startWidth;
@@ -92,7 +93,7 @@ function draw() {
                 if(i+1 === wave.length);
                 else {
                     // this looks ugly but nothing to do about it right now
-                    if(mode === 'flower')
+                    if(colorOption === 'random-every-line')
                         stroke(Math.random() * 255, Math.random() * 255, Math.random() * 255);
                     line(wave[i][0], wave[i][1], wave[i+1][0], wave[i+1][1]);
                 }
@@ -139,20 +140,12 @@ function setupHeader(){
     bottomText.style('font-size', '10px');
 }
 
-function setupButtons(){
-    buttonRainbow = createButton('rainbow');
-    buttonRainbow.position(30, 120, 65);
-    buttonRainbow.mousePressed(() => { mode = 'rainbow'; }); 
-    buttonBlackAndWhite = createButton('black-and-white');
-    buttonBlackAndWhite.position(30, 150, 65);
-    buttonBlackAndWhite.mousePressed(() => { mode = 'black-and-white'; }); 
-    buttonBoring = createButton('boring');
-    buttonBoring.position(30, 180, 65);
-    buttonBoring.mousePressed(() => { mode = 'default'; });
-    buttonFlower = createButton('flower');
-    buttonFlower.position(30, 210, 65);
-    buttonFlower.mousePressed(() => { mode = 'flower' ; });
-    buttonWesAnderson = createButton('wes-anderson');
-    buttonWesAnderson.position(30, 240, 65);
-    buttonWesAnderson.mousePressed(() => { mode = 'wes-anderson';});
+// create buttons for users to select line options
+function setupLineOptions(){
+    let tempButton;
+    lineModes.forEach((element, i) => {
+        tempButton = createButton(element.name);
+        tempButton.position(element.position[0], element.position[1], element.position[2]);
+        tempButton.mousePressed(() => { selectedLineMode = i; }) 
+    });
 }
