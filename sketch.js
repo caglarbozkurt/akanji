@@ -1,13 +1,13 @@
 let wave = [], x, y, startWidth, startHeight, mic;
-let logo, infoText_1, infoText_2, bottomText;
+let logo, infoText_1, infoText_2, infoText_3, bottomText, zoomSlider;
 let colorR, colorG, colorB;
-let selectedLineMode = 0, selectedVisualMode = 0;
+let selectedLineMode = 0, selectedVisualMode = 0, zoomLevel = 1;
 let buttons = [];
 const visualModes = ['lines', 'circles [😐]', 'triangles [😐]', 'fractals [😐]', 'experimential [😐]'];
 const lineModes = 
     [{
         name: 'boring', 
-        position: [30, 180, 65],
+        position: [30, 220, 65],
         colorOption: 'static',
         colors: [0,0,0],
         bg: [255, 255, 255],
@@ -16,14 +16,14 @@ const lineModes =
     },
     { 
         name: 'rainbow', 
-        position: [30, 120, 65],
+        position: [30, 160, 65],
         colorOption: 'random',
         bg: [255, 255, 255], 
         textColorOption: 'dynamic'
     },
     {
         name: 'black-and-white', 
-        position: [30, 150, 65],
+        position: [30, 190, 65],
         colorOption: 'static',
         colors: [255, 255, 255],
         bg: [0, 0, 0],
@@ -32,14 +32,14 @@ const lineModes =
     },
     {
         name: 'flower', 
-        position: [30, 210, 65],
+        position: [30, 250, 65],
         colorOption: 'random-every-line',
         bg: [0, 0, 0],
         textColorOption: 'dynamic'
     },
     {
         name: 'wes-anderson', 
-        position: [30, 240, 65],
+        position: [30, 280, 65],
         colorOption: 'static',
         colors: [240, 211, 154],
         bg: [138, 174, 191],
@@ -48,7 +48,7 @@ const lineModes =
     },
     {
         name: 'fifty-shades-of-white',
-        position: [30, 270, 65],
+        position: [30, 310, 65],
         colorOption: 'fading',
         bg: [0, 0, 0],
         textColorOption: 'static',
@@ -191,9 +191,23 @@ function setupHeader(){
     infoText_2 = createSpan('also, touch/click on the screen it isn\'t working.');
     infoText_2.position(30, 95);
     infoText_2.style('font-size', '10px');
+    infoText_3 = createSpan('use slider below to configure zoom level.');
+    infoText_3.position(30, 110);
+    infoText_3.style('font-size', '10px');
     bottomText = createSpan('made with p5.js by <a href="https://github.com/caglarbozkurt">Çağlar Bozkurt</a> 👨🏻‍🚀');
     bottomText.position(30, windowHeight - 45);
     bottomText.style('font-size', '10px');
+    zoomSlider = createSlider(1, 5, 1, 1);
+    zoomSlider.position(30, 130);
+    zoomSlider.changed(() => {
+        let zoomMultiplier = zoomSlider.value() / zoomLevel;
+        if(!(wave === null)){
+            wave.forEach(element => {
+                element[1] = startHeight - ((startHeight - element[1]) * zoomMultiplier);                
+            });
+        }
+        zoomLevel = zoomSlider.value();
+    });
 }
 
 function resetUI(){
@@ -201,10 +215,11 @@ function resetUI(){
     logo.style('color', 'rgb(0, 0, 0)');
     infoText_1.style('color', 'rgb(0, 0, 0)');
     infoText_2.style('color', 'rgb(0, 0, 0)');
+    infoText_3.style('color', 'rgb(0, 0, 0)');
     bottomText.style('color', 'rgb(0, 0, 0)');
     buttons.forEach((element, i) => {
         element.remove();
-    })
+    });
     buttons = [];
     switch(selectedVisualMode){
         case 0:
