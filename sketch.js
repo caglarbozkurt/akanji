@@ -3,7 +3,7 @@ let logo, infoText_1, infoText_2, infoText_3, bottomText, zoomSlider;
 let colorR, colorG, colorB;
 let selectedLineMode = 0, selectedVisualMode = 0, zoomLevel = 1;
 let buttons = [];
-const visualModes = ['lines', 'circles [😐]', 'triangles [😐]', 'fractals [😐]', 'experimential [😐]'];
+const visualModes = ['lines [🤙]', 'circles [😐]', 'triangles [😐]', 'fractals [😐]', 'experimential [😐]'];
 const lineModes = 
     [{
         name: 'boring', 
