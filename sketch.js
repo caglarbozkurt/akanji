@@ -155,7 +155,6 @@ function drawTriangleMode(){
 }
 
 function drawCircleMode(){
-
 }
 
 function drawExperimentialMode(){
@@ -226,7 +225,7 @@ function resetUI(){
         case 0:
             setupLineOptions();
             break;
-        case 1:
+        case 1:    
             break;
         case 2:
             break;
